@@ -1,0 +1,20 @@
+FROM python:3.10-slim
+
+RUN apt-get update && \
+    apt-get install -y wget git libgl1-mesa-glx libglib2.0-0 && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY . .
+
+ENV MINICONDA_VERSION 4.8.2
+ENV PATH /opt/conda/bin:$PATH
+RUN wget \
+    "https://repo.anaconda.com/miniconda/Miniconda3-py38_${MINICONDA_VERSION}-Linux-x86_64.sh" \
+    -O /miniconda.sh \
+    && bash /miniconda.sh -b -p /opt/conda \
+    && rm /miniconda.sh \
+    && conda clean -tipsy
+
+RUN conda env update --name base --file /app/conda_env_torch_zoo.yml
